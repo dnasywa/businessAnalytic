@@ -1,0 +1,31 @@
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+# load dataset
+import pandas as pd
+dataframe = pd.read_csv("fiturAugmenting.csv", header=None)
+dataset = dataframe.values
+ilabel = 29
+jclass = 6
+X = dataset[:,0:ilabel].astype(float)
+Y = dataset[:,ilabel]
+
+# data splitting
+from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=.2, random_state=42)
+
+# build classification - naive bayes
+from sklearn.naive_bayes import GaussianNB
+nb = GaussianNB()
+nb.fit(X_train, Y_train)
+
+# prediction probabilities
+nb_probs = nb.predict_proba(X_test)
+
+# computing AUROC values and ROC curve
+from sklearn.metrics import roc_curve, roc_auc_score
+nb_auc = roc_auc_score(Y_test, nb_probs, multi_class="ovr")
+
+# print('Random (chance) Prediction: AUROC = %.3f' % (r_auc))
+print('Naive Bayes: AUROC = %.3f' % (nb_auc*100))
