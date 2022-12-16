@@ -1,15 +1,10 @@
-# multi-class classification with Keras
-import pandas
-from keras.models import Sequential
-from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
-from keras.utils import np_utils
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
-from sklearn.preprocessing import LabelEncoder
 from sklearn.pipeline import Pipeline
 
 # load dataset
+import pandas
 dataframe = pandas.read_csv("features.csv", header=None)
 dataset = dataframe.values
 ilabel = 29
@@ -18,6 +13,8 @@ X = dataset[:,0:ilabel].astype(float)
 Y = dataset[:,ilabel]
 
 # encode class values as integers
+from sklearn.preprocessing import LabelEncoder
+from keras.utils import np_utils
 encoder = LabelEncoder()
 encoder.fit(Y)
 encoded_Y = encoder.transform(Y)
@@ -25,6 +22,8 @@ encoded_Y = encoder.transform(Y)
 dummy_y = np_utils.to_categorical(encoded_Y)
 
 # create model
+from keras.models import Sequential
+from keras.layers import Dense
 model = Sequential()
 model.add(Dense(8, input_dim=ilabel, activation='relu'))
 model.add(Dense(jclass, activation='softmax'))
