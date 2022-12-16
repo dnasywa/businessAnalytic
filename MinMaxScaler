@@ -1,33 +1,31 @@
-# evaluate knn on the sonar dataset with minmax scaler transform
-from numpy import mean
-from numpy import std
-from pandas import read_csv
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedStratifiedKFold
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.pipeline import Pipeline
 from matplotlib import pyplot
 
 # load dataset
+from pandas import read_csv
 dataset = read_csv("features.csv", header=None)
 data = dataset.values
-
-# separate into input and output columns
 X, y = data[:, :-1], data[:, -1]
+
 # ensure inputs are floats and output is an integer label
+from sklearn.preprocessing import LabelEncoder
 X = X.astype('float32')
 y = LabelEncoder().fit_transform(y.astype('str'))
 
 # define the pipeline
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import Pipeline
 trans = MinMaxScaler()
-model = KNeighborsClassifier()
+model = GaussianNB()
 pipeline = Pipeline(steps=[('t', trans), ('m', model)])
 
 # evaluate the pipeline
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedStratifiedKFold
 cv = RepeatedStratifiedKFold(n_splits=12, n_repeats=13, random_state=1)
 n_scores = cross_val_score(pipeline, X, y, scoring='accuracy', cv=cv, n_jobs=-1, error_score='raise')
 
 # report pipeline performance
+from numpy import mean
+from numpy import std
 print('Accuracy: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
