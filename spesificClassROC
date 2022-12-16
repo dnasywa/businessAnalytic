@@ -1,42 +1,38 @@
-#load data
+# load data
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-dataframe = pandas.read_csv("fiturAugmenting.csv", header=None)
+dataframe = pd.read_csv("fiturTambahanBaru.csv", header=None)
 dataset = dataframe.values
 ilabel = 29
 jclass = 6
 X = dataset[:,0:ilabel].astype(float)
 y = dataset[:,ilabel]
 
-random_state = np.random.RandomState(0)
-n_samples, n_features = X.shape
-n_classes = len(np.unique(y))
-X = np.concatenate([X, random_state.randn(n_samples, 200 * n_features)], axis=1)
-(
-    X_train,
-    X_test,
-    y_train,
-    y_test,
-) = train_test_split(X, y, test_size=0.5, stratify=y, random_state=0)
+# data splitting
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=.2, random_state=0)
 
-#model classifier
+# build classification - naive bayes
 from sklearn.naive_bayes import GaussianNB
+#------------------------------------------------ disesuikan dengan kasus, tetapi classifier tetap NB
 model = GaussianNB()
 model.fit(X_train, y_train)
+#----------------------------------------------------------------------------------------------------
 y_score = model.fit(X_train, y_train).predict_proba(X_test)
 
 # binarize the target
 from sklearn.preprocessing import LabelBinarizer
 label_binarizer = LabelBinarizer().fit(y_train)
 y_onehot_test = label_binarizer.transform(y_test)
-y_onehot_test.shape  # (n_samples, n_classes)
 
 # plot ROC Curve for spesific class as representative
-class_of_interest = "irritant"
+#-------------------------------------------------------- disesuaikan dengan kasus
+class_of_interest = "environment"
+#---------------------------------------------------------------------------------
 class_id = np.flatnonzero(label_binarizer.classes_ == class_of_interest)[0]
-class_id
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import RocCurveDisplay
@@ -51,6 +47,8 @@ plt.plot([0, 1], [0, 1], "k--", label="chance level (AUC = 0.5)")
 plt.axis("square")
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
-plt.title("One-vs-Rest ROC curves:\nIrritant vs Others(Non-Irritant)")
+#----------------------------------------- disesuaikan dengan kasus
+plt.title("One-vs-Rest ROC curves:\nEnvironment vs Others(Non-Environment)")
+#------------------------------------------------------------------
 plt.legend()
 plt.show()
